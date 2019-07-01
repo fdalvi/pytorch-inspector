@@ -2,8 +2,8 @@ pytorch-inspector
 =================
 
 A generic package to inspect and extract activations from deep learning models built in pytorch. The code allows you to:
-1: Extract the architecture of the model in a human-readable JSON file
-2: Extract activations from some or all of the intermediate modules (layers) of the model
+1. Extract the architecture of the model in a human-readable JSON file
+2. Extract activations from some or all of the intermediate modules (layers) of the model
 
 ### Installation and Running
 _`pip` support coming soon_
