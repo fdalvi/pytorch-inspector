@@ -40,7 +40,6 @@ def main(opt):
 
     for i, (src_shard, tgt_shard) in enumerate(shard_pairs):
         logger.info("Translating shard %d." % i)
-        print(src_shard)
         translator.translate(
             src=src_shard,
             tgt=tgt_shard,
