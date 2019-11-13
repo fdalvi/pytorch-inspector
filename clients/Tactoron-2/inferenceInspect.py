@@ -1,3 +1,4 @@
+# Sample command: python inferenceInspect.py --config_file structure.json --src abc --batch_size 1 --output_activations activations/five --mode extract_activations --model tacotron2_myModel.pt
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
@@ -36,7 +37,7 @@ def main(opt):
 	
 	hparams = create_hparams()
 	hparams.sampling_rate = 22050
-	checkpoint_path = "tacotron2_myModel.pt"
+	checkpoint_path = opt.model
 	model = load_model(hparams)
 	model.load_state_dict(torch.load(checkpoint_path)['state_dict'])
 	_ = model.cuda().eval().half()
@@ -69,6 +70,7 @@ if __name__ == "__main__":
 	add_opts(parser)
 	parser.add_argument("-src", "--src", dest="src", help="file containing source text", metavar="FILE")
 	parser.add_argument("-batch_size", "--batch_size", dest="batch_size", help="Batch size is required for nothing, just put 1", metavar="1")
+	parser.add_argument("-model", "--model", dest="model", help="Path to model file", metavar="FILE")
 	
 	opt = parser.parse_args()
 	main(opt)
