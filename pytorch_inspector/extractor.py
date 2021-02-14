@@ -20,7 +20,8 @@ class ActivationsExtractor():
             self.activation_extractors.append(
                 SingleModuleActivationsExtractor(path, model, self.flush_shard,
                                            shard_size=self.shard_size,
-                                           batch_dim=config[name]['batch_dim'])
+                                           batch_dim=config[name]['batch_dim'],
+                                           tuple_dim=config[name]['tuple_dim'])
             )
 
         model_child_modules = list(model.named_children())
@@ -46,25 +47,30 @@ class ActivationsExtractor():
 
 ## Assumption: Batch size is set to 1
 class SingleModuleActivationsExtractor():
-    def __init__(self, name, module, global_flush_activations, shard_size=0, batch_dim=0):
+    def __init__(self, name, module, global_flush_activations, shard_size=0, batch_dim=0, tuple_dim=0):
         self.activations = []
         self.name = name
         self.batch_dim = batch_dim
+        self.tuple_dim = tuple_dim
         self.hook = module.register_forward_hook(self.capture_activations)
         self.global_flush_activations = global_flush_activations
         self.shard_size = shard_size
 
-    def capture_activations(self, module, inputs, outputs, debug=False):
+    def capture_activations(self, module, inputs, outputs, debug=True):
         if debug:
             print("Capturing activations for:")
             print(module)
-            print(inputs.shape + " -> " + outputs.shape)
+            #print(inputs.shape + " -> " + outputs.shape)
 
         if self.shard_size != 0 and len(self.activations)+1 > self.shard_size:
             print("Flushing shard to disk")
             self.global_flush_activations()
 
-        current_acts = outputs.cpu().detach().numpy()
+        if self.tuple_dim == -1:
+            current_acts = outputs.cpu().detach().numpy()
+        else:
+            current_acts = outputs[self.tuple_dim].cpu().detach().numpy()
+
         assert current_acts.shape[self.batch_dim] == 1, \
             ("Invalid batch_dim for module", module)
         current_acts = current_acts.squeeze(axis=self.batch_dim)

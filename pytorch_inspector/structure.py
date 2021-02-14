@@ -5,6 +5,7 @@ def extract_structure(model, name="full_model"):
         name: {
             'extract': False,
             'batch_dim': 0,
+            'tuple_dim': -1,
             'children': []
         }
     }
